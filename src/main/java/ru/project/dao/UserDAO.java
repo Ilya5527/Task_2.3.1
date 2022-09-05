@@ -8,7 +8,7 @@ public interface UserDAO {
 
     public void add(User user);
 
-    public void delete(User user);
+    public void delete(long id);
 
     public List<User> getAllUsers();
 
