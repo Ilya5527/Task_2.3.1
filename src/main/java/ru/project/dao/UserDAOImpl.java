@@ -38,4 +38,9 @@ public class UserDAOImpl implements UserDAO {
         User user = entityManager.find(User.class, id);
         return user;
     }
+
+    @Override
+    public void update(User changedUser) {
+        entityManager.merge(changedUser);
+    }
 }

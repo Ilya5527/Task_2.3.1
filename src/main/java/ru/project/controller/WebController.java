@@ -1,62 +1,74 @@
 package ru.project.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.project.entity.User;
 import ru.project.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
 @RequestMapping("/userList")
 public class WebController {
 
-    private UserService userService;
+    private final UserService service;
 
     public WebController(UserService userService) {
-        this.userService = userService;
+        this.service = userService;
     }
 
 
     @GetMapping()
-    public String usersList (ModelMap modelMap) {
+    public String usersList(ModelMap modelMap) {
 
-        List<User> userList = userService.getAllUsers();
+        List<User> userList = service.getAllUsers();
         modelMap.addAttribute("users", userList);
 
         return "userList";
     }
 
     @GetMapping("/addUser")
-    public String addUser (ModelMap model) {
+    public String addUser(ModelMap model) {
         model.addAttribute("user", new User());
         return "addUser";
     }
 
 
     @PostMapping()
-    public String create (@ModelAttribute("user") User user) {
-        userService.add(user);
+    public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            if (bindingResult.hasErrors()) {
+                return "addUser";
+            }
+        }
+        service.add(user);
         return "redirect:userList";
-    }
-
-    @GetMapping("/{id}")
-    public String deleteUser (@PathVariable("id") long id, ModelMap model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
-
-        return "deleteUser";
     }
 
     @DeleteMapping("/{id}")
-    public String getUser (@PathVariable("id") long id) {
+    public String getUser(@PathVariable("id") long id) {
 
-        System.out.println(id);
+        service.delete(id);
 
-        userService.delete(id);
+        return "redirect:/userList";
+    }
 
-        return "redirect:userList";
+    @GetMapping("/{id}/updateUser")
+    public String update(@PathVariable("id") long id, ModelMap model) {
+        User user = service.getUserById(id);
+        model.addAttribute("user", user);
+        return "updateUser";
+    }
+
+    @PatchMapping("/{id}")
+    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "updateUser";
+        }
+        service.update(user);
+        return "redirect:/userList";
     }
 }

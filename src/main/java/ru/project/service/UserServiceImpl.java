@@ -8,23 +8,22 @@ import ru.project.entity.User;
 import java.util.List;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
 
-    private UserDAO userDAO;
+    private final UserDAO userDAO;
 
     public UserServiceImpl(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
     @Override
-    @Transactional
     public void add(User user) {
         userDAO.add(user);
     }
 
     @Override
-    @Transactional
     public void delete(long id) {
         userDAO.delete(id);
     }
@@ -39,5 +38,10 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User getUserById(long id) {
         return userDAO.getUserById(id);
+    }
+
+    @Override
+    public void update(User changedUser) {
+        userDAO.update(changedUser);
     }
 }
